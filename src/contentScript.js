@@ -130,7 +130,7 @@ function generateICS(data) {
       start: [Number(item.date.split("/")[2]), Number(item.date.split("/")[1]), Number(item.date.split("/")[0]), Number(item.startTime.split(":")[0]), Number(item.startTime.split(":")[1])],
       end: [Number(item.date.split("/")[2]), Number(item.date.split("/")[1]), Number(item.date.split("/")[0]), Number(item.endTime.split(":")[0]), Number(item.endTime.split(":")[1])],
       location: `${item.room}${item.room === 'Online' ? '' : '\n172A Ang Mo Kio Ave 8\n567739\nSingapore'}`,
-      description: `Class Nbr: ${item.instructor}\nInstructor(s): ${item.instructor}`
+      description: `Class Nbr: ${item.classNbr}\nInstructor(s): ${item.instructor}`
     }
   });
   const { error, value } = ics.createEvents(processedData);
