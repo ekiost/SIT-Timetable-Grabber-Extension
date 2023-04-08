@@ -1,15 +1,15 @@
 # <img src="public/icons/icon_48.png" width="45" align="left"> Sit Timetable
 
-My Chrome Extension
+SIT timetable extension for chrome
 
 ## Features
 
-- Feature 1
-- Feature 2
+- Extracts timetable from SIT website and downloads it as a ICS file
+- Can be used to import timetable to your calendar app (Google Calendar, Outlook, etc.)
 
-## Install
+<!-- ## Install
 
-[**Chrome** extension]() <!-- TODO: Add chrome extension link inside parenthesis -->
+[**Chrome** extension]() TODO: Add chrome extension link inside parenthesis -->
 
 ## Contribution
 

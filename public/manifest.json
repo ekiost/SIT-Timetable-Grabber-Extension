@@ -16,9 +16,6 @@
     "default_title": "SIT Timetable Grabber",
     "default_popup": "popup.html"
   },
-  "permissions": [
-    "storage"
-  ],
   "content_scripts": [
     {
       "matches": [
