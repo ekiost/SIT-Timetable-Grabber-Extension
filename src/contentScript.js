@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 // Content script file will run in the context of web page.
 // With content script you can manipulate the web pages using
@@ -12,7 +12,7 @@
 // See https://developer.chrome.com/extensions/content_scripts
 
 // Log `title` of current active web page
-const pageTitle = document.head.getElementsByTagName('title')[0].innerHTML;
+const pageTitle = document.head.getElementsByTagName("title")[0].innerHTML;
 console.log(
   `Page title is: '${pageTitle}' - evaluated by Chrome extension's 'contentScript.js' file`
 );
@@ -20,9 +20,9 @@ console.log(
 // Communicate with background file by sending a message
 chrome.runtime.sendMessage(
   {
-    type: 'GREETINGS',
+    type: "GREETINGS",
     payload: {
-      message: 'Hello, my name is Con. I am from ContentScript.',
+      message: "Hello, my name is Con. I am from ContentScript.",
     },
   },
   (response) => {
@@ -32,25 +32,28 @@ chrome.runtime.sendMessage(
 
 // Listen for message
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.type === 'EXTRACT') {
+  if (request.type === "EXTRACT") {
     // check if the page is the timetable page
-    const iframe = document.getElementsByClassName('ps_target-iframe');
+    const iframe = document.getElementsByClassName("ps_target-iframe");
     if (iframe.length === 0) {
-      alert('Please go to the timetable page first!');
+      alert("Please go to the timetable page first!");
       sendResponse({});
       return;
     }
 
-    const main = iframe[0].contentDocument.getElementsByClassName('PSGROUPBOXWBO');
+    const main =
+      iframe[0].contentDocument.getElementsByClassName("PSGROUPBOXWBO");
     if (main.length === 0) {
-      alert('Please go to the timetable page first!');
+      alert("Please go to the timetable page first!");
       sendResponse({});
       return;
     }
-    // check if the radio button is 
-    const listViewRadioButton = iframe[0].contentDocument.getElementById("DERIVED_REGFRM1_SSR_SCHED_FORMAT$258$");
+    // check if the radio button is
+    const listViewRadioButton = iframe[0].contentDocument.getElementById(
+      "DERIVED_REGFRM1_SSR_SCHED_FORMAT$258$"
+    );
     if (listViewRadioButton.checked === false) {
-      alert('Please select the list view first!');
+      alert("Please select the list view first!");
       sendResponse({});
       return;
     }
@@ -58,13 +61,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     const data = [];
     // console.log(`Current count is ${request.payload.count}`);
 
-
-
     for (let i = 1; i < main.length; i++) {
       const element = main[i];
-      const courseName = element.getElementsByClassName('PAGROUPDIVIDER')[0].innerText;
+      const courseName =
+        element.getElementsByClassName("PAGROUPDIVIDER")[0].innerText;
 
-      const timetable = element.querySelectorAll("tbody > tr > td > table > tbody")[2];
+      const timetable = element.querySelectorAll(
+        "tbody > tr > td > table > tbody"
+      )[2];
 
       const rows = timetable.querySelectorAll("tr");
 
@@ -104,7 +108,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           endTime: endTime,
           room: room,
           instructor: instructor,
-          date: date
+          date: date,
         });
       }
     }
@@ -120,24 +124,39 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   return true;
 });
 
-
 function generateICS(data) {
-  const ics = require('../node_modules/ics/dist')
+  const ics = require("../node_modules/ics/dist");
 
   const processedData = data.map((item) => {
     return {
       title: `${item.courseName} (${item.section} ${item.component})`,
-      start: [Number(item.date.split("/")[2]), Number(item.date.split("/")[1]), Number(item.date.split("/")[0]), Number(item.startTime.split(":")[0]), Number(item.startTime.split(":")[1])],
-      end: [Number(item.date.split("/")[2]), Number(item.date.split("/")[1]), Number(item.date.split("/")[0]), Number(item.endTime.split(":")[0]), Number(item.endTime.split(":")[1])],
-      location: `${item.room}${item.room === 'Online' ? '' : '\n172A Ang Mo Kio Ave 8\n567739\nSingapore'}`,
-      description: `Class Nbr: ${item.classNbr}\nInstructor(s): ${item.instructor}`
-    }
+      start: [
+        Number(item.date.split("/")[2]),
+        Number(item.date.split("/")[1]),
+        Number(item.date.split("/")[0]),
+        Number(item.startTime.split(":")[0]),
+        Number(item.startTime.split(":")[1]),
+      ],
+      end: [
+        Number(item.date.split("/")[2]),
+        Number(item.date.split("/")[1]),
+        Number(item.date.split("/")[0]),
+        Number(item.endTime.split(":")[0]),
+        Number(item.endTime.split(":")[1]),
+      ],
+      location: `${item.room}${
+        item.room === "Online"
+          ? ""
+          : "\n172A Ang Mo Kio Ave 8\n567739\nSingapore"
+      }`,
+      description: `Class Nbr: ${item.classNbr}\nInstructor(s): ${item.instructor}`,
+    };
   });
   const { error, value } = ics.createEvents(processedData);
 
   if (error) {
-    console.log(error)
-    return
+    console.log(error);
+    return;
   }
 
   return value;
@@ -152,16 +171,16 @@ function downloadICS(ics) {
   // element.click();
 
   // Create a Blob object from the ICS data
-  const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8;' });
+  const blob = new Blob([ics], { type: "text/calendar;charset=utf-8;" });
 
   // Create a URL object from the Blob
   const url = URL.createObjectURL(blob);
 
   // Create a download link and click it to trigger the download
-  const link = document.createElement('a');
+  const link = document.createElement("a");
   link.href = url;
-  link.download = 'myFile.ics';
-  link.style.display = 'none';
+  link.download = "myFile.ics";
+  link.style.display = "none";
   document.body.appendChild(link);
   link.click();
 

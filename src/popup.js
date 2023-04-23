@@ -1,6 +1,6 @@
-'use strict';
+"use strict";
 
-import './popup.css';
+import "./popup.css";
 
 (function () {
   // We will make use of Storage API to get and store `count` value
@@ -44,7 +44,7 @@ import './popup.css';
   //   });
   // }
 
-  document.getElementById('extractBtn').addEventListener('click', () => {
+  document.getElementById("extractBtn").addEventListener("click", () => {
     updateCounter({
       // type: 'INCREMENT',
     });
@@ -74,13 +74,13 @@ import './popup.css';
         tab.id,
         {
           // type: 'COUNT',
-          type: 'EXTRACT',
+          type: "EXTRACT",
           // payload: {
           //   count: newCount,
           // },
         },
         (response) => {
-          console.log('Current count value passed to contentScript file');
+          console.log("Current count value passed to contentScript file");
         }
       );
     });
@@ -107,9 +107,9 @@ import './popup.css';
   // Communicate with background file by sending a message
   chrome.runtime.sendMessage(
     {
-      type: 'GREETINGS',
+      type: "GREETINGS",
       payload: {
-        message: 'Hello, my name is Pop. I am from Popup.',
+        message: "Hello, my name is Pop. I am from Popup.",
       },
     },
     (response) => {
