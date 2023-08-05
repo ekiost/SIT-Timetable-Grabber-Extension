@@ -3952,7 +3952,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 });
 
 function generateICS(data) {
-  const ics = __webpack_require__(/*! ../node_modules/ics/dist */ "./node_modules/ics/dist/index.js");
+  const ics = __webpack_require__(/*! ics */ "./node_modules/ics/dist/index.js");
 
   const processedData = data.map((item) => {
     return {

@@ -136,7 +136,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 });
 
 function generateICS(data) {
-  const ics = require("../node_modules/ics/dist");
+  const ics = require("ics");
 
   const processedData = data.map((item) => {
     return {
