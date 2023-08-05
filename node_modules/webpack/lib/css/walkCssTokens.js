@@ -7,7 +7,7 @@
 
 /**
  * @typedef {Object} CssTokenCallbacks
- * @property {function(string, number): boolean} isSelector
+ * @property {function(string, number): boolean=} isSelector
  * @property {function(string, number, number, number, number): number=} url
  * @property {function(string, number, number): number=} string
  * @property {function(string, number, number): number=} leftParenthesis
@@ -76,6 +76,10 @@ const CC_HYPHEN_MINUS = "-".charCodeAt(0);
 const CC_LESS_THAN_SIGN = "<".charCodeAt(0);
 const CC_GREATER_THAN_SIGN = ">".charCodeAt(0);
 
+/**
+ * @param {number} cc char code
+ * @returns {boolean} true, if cc is a newline
+ */
 const _isNewLine = cc => {
 	return (
 		cc === CC_LINE_FEED || cc === CC_CARRIAGE_RETURN || cc === CC_FORM_FEED
@@ -84,6 +88,7 @@ const _isNewLine = cc => {
 
 /** @type {CharHandler} */
 const consumeSpace = (input, pos, callbacks) => {
+	/** @type {number} */
 	let cc;
 	do {
 		pos++;
@@ -92,17 +97,41 @@ const consumeSpace = (input, pos, callbacks) => {
 	return pos;
 };
 
-const _isWhiteSpace = cc => {
+/**
+ * @param {number} cc char code
+ * @returns {boolean} true, if cc is a newline
+ */
+const _isNewline = cc => {
 	return (
-		cc === CC_LINE_FEED ||
-		cc === CC_CARRIAGE_RETURN ||
-		cc === CC_FORM_FEED ||
-		cc === CC_TAB ||
-		cc === CC_SPACE
+		cc === CC_LINE_FEED || cc === CC_CARRIAGE_RETURN || cc === CC_FORM_FEED
 	);
 };
 
-const _isIdentStartCodePoint = cc => {
+/**
+ * @param {number} cc char code
+ * @returns {boolean} true, if cc is a space (U+0009 CHARACTER TABULATION or U+0020 SPACE)
+ */
+const _isSpace = cc => {
+	return cc === CC_TAB || cc === CC_SPACE;
+};
+
+/**
+ * @param {number} cc char code
+ * @returns {boolean} true, if cc is a whitespace
+ */
+const _isWhiteSpace = cc => {
+	return _isNewline(cc) || _isSpace(cc);
+};
+
+/**
+ * ident-start code point
+ *
+ * A letter, a non-ASCII code point, or U+005F LOW LINE (_).
+ *
+ * @param {number} cc char code
+ * @returns {boolean} true, if cc is a start code point of an identifier
+ */
+const isIdentStartCodePoint = cc => {
 	return (
 		(cc >= CC_LOWER_A && cc <= CC_LOWER_Z) ||
 		(cc >= CC_UPPER_A && cc <= CC_UPPER_Z) ||
@@ -145,21 +174,27 @@ const consumeComments = (input, pos, callbacks) => {
 };
 
 /** @type {function(number): CharHandler} */
-const consumeString = end => (input, pos, callbacks) => {
+const consumeString = quote_cc => (input, pos, callbacks) => {
 	const start = pos;
-	pos = _consumeString(input, pos, end);
+	pos = _consumeString(input, pos, quote_cc);
 	if (callbacks.string !== undefined) {
 		pos = callbacks.string(input, start, pos);
 	}
 	return pos;
 };
 
-const _consumeString = (input, pos, end) => {
+/**
+ * @param {string} input input
+ * @param {number} pos position
+ * @param {number} quote_cc quote char code
+ * @returns {number} new position
+ */
+const _consumeString = (input, pos, quote_cc) => {
 	pos++;
 	for (;;) {
 		if (pos === input.length) return pos;
 		const cc = input.charCodeAt(pos);
-		if (cc === end) return pos + 1;
+		if (cc === quote_cc) return pos + 1;
 		if (_isNewLine(cc)) {
 			// bad string
 			return pos;
@@ -176,6 +211,10 @@ const _consumeString = (input, pos, end) => {
 	}
 };
 
+/**
+ * @param {number} cc char code
+ * @returns {boolean} is identifier start code
+ */
 const _isIdentifierStartCode = cc => {
 	return (
 		cc === CC_LOW_LINE ||
@@ -185,16 +224,30 @@ const _isIdentifierStartCode = cc => {
 	);
 };
 
+/**
+ * @param {number} first first code point
+ * @param {number} second second code point
+ * @returns {boolean} true if two code points are a valid escape
+ */
 const _isTwoCodePointsAreValidEscape = (first, second) => {
 	if (first !== CC_REVERSE_SOLIDUS) return false;
 	if (_isNewLine(second)) return false;
 	return true;
 };
 
+/**
+ * @param {number} cc char code
+ * @returns {boolean} is digit
+ */
 const _isDigit = cc => {
 	return cc >= CC_0 && cc <= CC_9;
 };
 
+/**
+ * @param {string} input input
+ * @param {number} pos position
+ * @returns {boolean} true, if input at pos starts an identifier
+ */
 const _startsIdentifier = (input, pos) => {
 	const cc = input.charCodeAt(pos);
 	if (cc === CC_HYPHEN_MINUS) {
@@ -220,7 +273,7 @@ const consumeNumberSign = (input, pos, callbacks) => {
 	pos++;
 	if (pos === input.length) return pos;
 	if (callbacks.isSelector(input, pos) && _startsIdentifier(input, pos)) {
-		pos = _consumeIdentifier(input, pos);
+		pos = _consumeIdentifier(input, pos, callbacks);
 		if (callbacks.id !== undefined) {
 			return callbacks.id(input, start, pos);
 		}
@@ -244,7 +297,7 @@ const consumeMinus = (input, pos, callbacks) => {
 		if (cc === CC_GREATER_THAN_SIGN) {
 			return pos + 1;
 		} else {
-			pos = _consumeIdentifier(input, pos);
+			pos = _consumeIdentifier(input, pos, callbacks);
 			if (callbacks.identifier !== undefined) {
 				return callbacks.identifier(input, start, pos);
 			}
@@ -253,7 +306,7 @@ const consumeMinus = (input, pos, callbacks) => {
 		if (pos + 1 === input.length) return pos;
 		const cc = input.charCodeAt(pos + 1);
 		if (_isNewLine(cc)) return pos;
-		pos = _consumeIdentifier(input, pos);
+		pos = _consumeIdentifier(input, pos, callbacks);
 		if (callbacks.identifier !== undefined) {
 			return callbacks.identifier(input, start, pos);
 		}
@@ -272,16 +325,17 @@ const consumeDot = (input, pos, callbacks) => {
 	if (_isDigit(cc)) return consumeNumericToken(input, pos - 2, callbacks);
 	if (!callbacks.isSelector(input, pos) || !_startsIdentifier(input, pos))
 		return pos;
-	pos = _consumeIdentifier(input, pos);
+	pos = _consumeIdentifier(input, pos, callbacks);
 	if (callbacks.class !== undefined) return callbacks.class(input, start, pos);
 	return pos;
 };
 
 /** @type {CharHandler} */
 const consumeNumericToken = (input, pos, callbacks) => {
-	pos = _consumeNumber(input, pos);
+	pos = _consumeNumber(input, pos, callbacks);
 	if (pos === input.length) return pos;
-	if (_startsIdentifier(input, pos)) return _consumeIdentifier(input, pos);
+	if (_startsIdentifier(input, pos))
+		return _consumeIdentifier(input, pos, callbacks);
 	const cc = input.charCodeAt(pos);
 	if (cc === CC_PERCENTAGE) return pos + 1;
 	return pos;
@@ -290,12 +344,8 @@ const consumeNumericToken = (input, pos, callbacks) => {
 /** @type {CharHandler} */
 const consumeOtherIdentifier = (input, pos, callbacks) => {
 	const start = pos;
-	pos = _consumeIdentifier(input, pos);
-	if (
-		pos !== input.length &&
-		!callbacks.isSelector(input, pos) &&
-		input.charCodeAt(pos) === CC_LEFT_PARENTHESIS
-	) {
+	pos = _consumeIdentifier(input, pos, callbacks);
+	if (pos !== input.length && input.charCodeAt(pos) === CC_LEFT_PARENTHESIS) {
 		pos++;
 		if (callbacks.function !== undefined) {
 			return callbacks.function(input, start, pos);
@@ -311,7 +361,7 @@ const consumeOtherIdentifier = (input, pos, callbacks) => {
 /** @type {CharHandler} */
 const consumePotentialUrl = (input, pos, callbacks) => {
 	const start = pos;
-	pos = _consumeIdentifier(input, pos);
+	pos = _consumeIdentifier(input, pos, callbacks);
 	const nextPos = pos + 1;
 	if (
 		pos === start + 3 &&
@@ -331,6 +381,7 @@ const consumePotentialUrl = (input, pos, callbacks) => {
 			return nextPos;
 		} else {
 			const contentStart = pos;
+			/** @type {number} */
 			let contentEnd;
 			for (;;) {
 				if (cc === CC_REVERSE_SOLIDUS) {
@@ -380,7 +431,7 @@ const consumePotentialPseudo = (input, pos, callbacks) => {
 	pos++;
 	if (!callbacks.isSelector(input, pos) || !_startsIdentifier(input, pos))
 		return pos;
-	pos = _consumeIdentifier(input, pos);
+	pos = _consumeIdentifier(input, pos, callbacks);
 	let cc = input.charCodeAt(pos);
 	if (cc === CC_LEFT_PARENTHESIS) {
 		pos++;
@@ -449,6 +500,7 @@ const consumeComma = (input, pos, callbacks) => {
 	return pos;
 };
 
+/** @type {CharHandler} */
 const _consumeIdentifier = (input, pos) => {
 	for (;;) {
 		const cc = input.charCodeAt(pos);
@@ -468,6 +520,7 @@ const _consumeIdentifier = (input, pos) => {
 	}
 };
 
+/** @type {CharHandler} */
 const _consumeNumber = (input, pos) => {
 	pos++;
 	if (pos === input.length) return pos;
@@ -526,12 +579,13 @@ const consumeLessThan = (input, pos, callbacks) => {
 	return pos + 1;
 };
 
+/** @type {CharHandler} */
 const consumeAt = (input, pos, callbacks) => {
 	const start = pos;
 	pos++;
 	if (pos === input.length) return pos;
 	if (_startsIdentifier(input, pos)) {
-		pos = _consumeIdentifier(input, pos);
+		pos = _consumeIdentifier(input, pos, callbacks);
 		if (callbacks.atKeyword !== undefined) {
 			pos = callbacks.atKeyword(input, start, pos);
 		}
@@ -629,7 +683,7 @@ const CHAR_MAP = Array.from({ length: 0x80 }, (_, cc) => {
 			// digit
 			if (_isDigit(cc)) return consumeNumericToken;
 			// ident-start code point
-			if (_isIdentStartCodePoint(cc)) {
+			if (isIdentStartCodePoint(cc)) {
 				return consumeOtherIdentifier;
 			}
 			// EOF, but we don't have it
@@ -661,59 +715,76 @@ module.exports = (input, callbacks) => {
 	}
 };
 
+module.exports.isIdentStartCodePoint = isIdentStartCodePoint;
+
+/**
+ * @param {string} input input
+ * @param {number} pos position
+ * @returns {number} position after comments
+ */
 module.exports.eatComments = (input, pos) => {
-	loop: for (;;) {
-		const cc = input.charCodeAt(pos);
-		if (cc === CC_SOLIDUS) {
-			if (pos === input.length) return pos;
-			let cc = input.charCodeAt(pos + 1);
-			if (cc !== CC_ASTERISK) return pos;
-			pos++;
-			for (;;) {
-				pos++;
-				if (pos === input.length) return pos;
-				cc = input.charCodeAt(pos);
-				while (cc === CC_ASTERISK) {
-					pos++;
-					if (pos === input.length) return pos;
-					cc = input.charCodeAt(pos);
-					if (cc === CC_SOLIDUS) {
-						pos++;
-						continue loop;
-					}
-				}
-			}
+	for (;;) {
+		let originalPos = pos;
+		pos = consumeComments(input, pos, {});
+		if (originalPos === pos) {
+			break;
 		}
-		return pos;
 	}
+
+	return pos;
 };
 
+/**
+ * @param {string} input input
+ * @param {number} pos position
+ * @returns {number} position after whitespace
+ */
+module.exports.eatWhitespace = (input, pos) => {
+	while (_isWhiteSpace(input.charCodeAt(pos))) {
+		pos++;
+	}
+
+	return pos;
+};
+
+/**
+ * @param {string} input input
+ * @param {number} pos position
+ * @returns {number} position after whitespace and comments
+ */
 module.exports.eatWhitespaceAndComments = (input, pos) => {
-	loop: for (;;) {
-		const cc = input.charCodeAt(pos);
-		if (cc === CC_SOLIDUS) {
-			if (pos === input.length) return pos;
-			let cc = input.charCodeAt(pos + 1);
-			if (cc !== CC_ASTERISK) return pos;
+	for (;;) {
+		let originalPos = pos;
+		pos = consumeComments(input, pos, {});
+		while (_isWhiteSpace(input.charCodeAt(pos))) {
 			pos++;
-			for (;;) {
-				pos++;
-				if (pos === input.length) return pos;
-				cc = input.charCodeAt(pos);
-				while (cc === CC_ASTERISK) {
-					pos++;
-					if (pos === input.length) return pos;
-					cc = input.charCodeAt(pos);
-					if (cc === CC_SOLIDUS) {
-						pos++;
-						continue loop;
-					}
-				}
-			}
-		} else if (_isWhiteSpace(cc)) {
+		}
+		if (originalPos === pos) {
+			break;
+		}
+	}
+
+	return pos;
+};
+
+/**
+ * @param {string} input input
+ * @param {number} pos position
+ * @returns {number} position after whitespace
+ */
+module.exports.eatWhiteLine = (input, pos) => {
+	for (;;) {
+		const cc = input.charCodeAt(pos);
+		if (_isSpace(cc)) {
 			pos++;
 			continue;
 		}
-		return pos;
+		if (_isNewLine(cc)) pos++;
+		// For `\r\n`
+		if (cc === CC_CARRIAGE_RETURN && input.charCodeAt(pos + 1) === CC_LINE_FEED)
+			pos++;
+		break;
 	}
+
+	return pos;
 };

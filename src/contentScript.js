@@ -12,10 +12,15 @@
 // See https://developer.chrome.com/extensions/content_scripts
 
 // Log `title` of current active web page
-const pageTitle = document.head.getElementsByTagName("title")[0].innerHTML;
-console.log(
-  `Page title is: '${pageTitle}' - evaluated by Chrome extension's 'contentScript.js' file`
-);
+const titleTag = document.head.getElementsByTagName("title")[0];
+if (titleTag) {
+  const pageTitle = titleTag.innerHTML;
+  console.log(
+    `Page title is: '${pageTitle}' - evaluated by Chrome extension's 'contentScript.js' file`
+  );
+} else {
+  console.log("No title tag found in this document.");
+}
 
 // Communicate with background file by sending a message
 chrome.runtime.sendMessage(
@@ -144,11 +149,10 @@ function generateICS(data) {
         Number(item.endTime.split(":")[0]),
         Number(item.endTime.split(":")[1]),
       ],
-      location: `${item.room}${
-        item.room === "Online"
+      location: `${item.room}${item.room === "Online"
           ? ""
           : "\n172A Ang Mo Kio Ave 8\n567739\nSingapore"
-      }`,
+        }`,
       description: `Class Nbr: ${item.classNbr}\nInstructor(s): ${item.instructor}`,
     };
   });
@@ -163,28 +167,7 @@ function generateICS(data) {
 }
 
 function downloadICS(ics) {
-  // const element = document.createElement("a");
-  // const file = new Blob([ics], {type: 'text/plain'});
-  // element.href = URL.createObjectURL(file);
-  // element.download = "myFile.ics";
-  // document.body.appendChild(element); // Required for this to work in FireFox
-  // element.click();
-
-  // Create a Blob object from the ICS data
-  const blob = new Blob([ics], { type: "text/calendar;charset=utf-8;" });
-
-  // Create a URL object from the Blob
-  const url = URL.createObjectURL(blob);
-
-  // Create a download link and click it to trigger the download
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = "myFile.ics";
-  link.style.display = "none";
-  document.body.appendChild(link);
-  link.click();
-
-  // Clean up by removing the link and releasing the URL object
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
+  var FileSaver = require('file-saver');
+  var blob = new Blob([ics], {type: "text/plain;charset=utf-8"});
+  FileSaver.saveAs(blob, "myFile.ics");
 }
