@@ -3972,13 +3972,30 @@ function generateICS(data) {
         Number(item.endTime.split(":")[1]),
       ],
       location: `${item.room}${item.room === "Online"
-          ? ""
-          : "\n172A Ang Mo Kio Ave 8\n567739\nSingapore"
+        ? ""
+        : "\n172A Ang Mo Kio Ave 8\n567739\nSingapore"
         }`,
       description: `Class Nbr: ${item.classNbr}\nInstructor(s): ${item.instructor}`,
     };
   });
-  const { error, value } = ics.createEvents(processedData);
+  const event = {
+    start: [2018, 5, 30, 6, 30],
+    duration: { hours: 6, minutes: 30 },
+    title: 'Bolder Boulder',
+    description: 'Annual 10-kilometer run in Boulder, Colorado',
+    location: 'Folsom Field, University of Colorado (finish line)',
+    url: 'http://www.bolderboulder.com/',
+    geo: { lat: 40.0095, lon: 105.2669 },
+    categories: ['10k races', 'Memorial Day Weekend', 'Boulder CO'],
+    status: 'CONFIRMED',
+    busyStatus: 'BUSY',
+    organizer: { name: 'Admin', email: 'Race@BolderBOULDER.com' },
+    attendees: [
+      { name: 'Adam Gibbons', email: 'adam@example.com', rsvp: true, partstat: 'ACCEPTED', role: 'REQ-PARTICIPANT' },
+      { name: 'Brittany Seaton', email: 'brittany@example2.org', dir: 'https://linkedin.com/in/brittanyseaton', role: 'OPT-PARTICIPANT' }
+    ]
+  }
+  const { error, value } = ics.createEvents(event);
 
   if (error) {
     console.log(error);
@@ -3990,7 +4007,7 @@ function generateICS(data) {
 
 function downloadICS(ics) {
   var FileSaver = __webpack_require__(/*! file-saver */ "./node_modules/file-saver/dist/FileSaver.min.js");
-  var blob = new Blob([ics], {type: "text/plain;charset=utf-8"});
+  var blob = new Blob([ics], { type: "text/plain;charset=utf-8" });
   FileSaver.saveAs(blob, "myFile.ics");
 }
 
