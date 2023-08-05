@@ -3920,9 +3920,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         const startTime = daysNTimes[0];
         const endTime = daysNTimes[1];
 
-        console.log(
-          `${courseName} ${lastClassNbr} ${lastSection} ${lastComponent} ${startTime} ${endTime} ${room} ${instructor} ${date}`
-        );
 
         data.push({
           courseName: courseName,
@@ -3995,21 +3992,7 @@ function generateICS(data) {
     };
   });
 
-  console.log(processedData);
-
-  const adsf = [
-    {
-      title: 'Lunch',
-      start: [2018, 1, 15, 12, 15],
-      duration: { minutes: 45 }
-    },
-    {
-      title: 'Dinner',
-      start: [2018, 1, 15, 12, 15],
-      duration: { hours: 1, minutes: 30 }
-    }
-  ]
-  const { error, value } = ics.createEvents(adsf);
+  const { error, value } = ics.createEvents(processedData);
 
   if (error) {
     console.log(error);
