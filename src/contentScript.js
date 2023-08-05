@@ -120,6 +120,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
     const ics = generateICS(data);
 
+    console.log(ics);
+
     downloadICS(ics);
   }
 
