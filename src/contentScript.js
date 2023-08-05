@@ -162,7 +162,7 @@ function generateICS(data) {
       description: `Class Nbr: ${item.classNbr}\nInstructor(s): ${item.instructor}`,
     };
   });
-  const event = {
+  const adsf = {
     start: [2018, 5, 30, 6, 30],
     duration: { hours: 6, minutes: 30 },
     title: 'Bolder Boulder',
@@ -179,7 +179,7 @@ function generateICS(data) {
       { name: 'Brittany Seaton', email: 'brittany@example2.org', dir: 'https://linkedin.com/in/brittanyseaton', role: 'OPT-PARTICIPANT' }
     ]
   }
-  const { error, value } = ics.createEvents(event);
+  const { error, value } = ics.createEvents(adsf);
 
   if (error) {
     console.log(error);
