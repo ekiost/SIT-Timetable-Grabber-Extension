@@ -3978,23 +3978,18 @@ function generateICS(data) {
       description: `Class Nbr: ${item.classNbr}\nInstructor(s): ${item.instructor}`,
     };
   });
-  const adsf = {
-    start: [2018, 5, 30, 6, 30],
-    duration: { hours: 6, minutes: 30 },
-    title: 'Bolder Boulder',
-    description: 'Annual 10-kilometer run in Boulder, Colorado',
-    location: 'Folsom Field, University of Colorado (finish line)',
-    url: 'http://www.bolderboulder.com/',
-    geo: { lat: 40.0095, lon: 105.2669 },
-    categories: ['10k races', 'Memorial Day Weekend', 'Boulder CO'],
-    status: 'CONFIRMED',
-    busyStatus: 'BUSY',
-    organizer: { name: 'Admin', email: 'Race@BolderBOULDER.com' },
-    attendees: [
-      { name: 'Adam Gibbons', email: 'adam@example.com', rsvp: true, partstat: 'ACCEPTED', role: 'REQ-PARTICIPANT' },
-      { name: 'Brittany Seaton', email: 'brittany@example2.org', dir: 'https://linkedin.com/in/brittanyseaton', role: 'OPT-PARTICIPANT' }
-    ]
-  }
+  const adsf = [
+    {
+      title: 'Lunch',
+      start: [2018, 1, 15, 12, 15],
+      duration: { minutes: 45 }
+    },
+    {
+      title: 'Dinner',
+      start: [2018, 1, 15, 12, 15],
+      duration: { hours: 1, minutes: 30 }
+    }
+  ]
   const { error, value } = ics.createEvents(adsf);
 
   if (error) {
