@@ -3902,7 +3902,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         const classNbr = cells[0].innerText.trim();
         const section = cells[1].innerText.trim();
         const component = cells[2].innerText.trim();
-        const daysNTimes = cells[3].innerText.trim().slice(3, 16).split(" - ");
+        const daysNTimes = normalizeTime(cells[3].innerText.trim().slice(3)).split(" - ");
         const room = cells[4].innerText.trim();
         const instructor = cells[5].innerText.trim();
         const date = cells[6].innerText.trim().split(" - ")[0];
@@ -3951,6 +3951,22 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   return true;
 });
 
+function normalizeTime(timeStr) {
+  function to24HourFormat(t) {
+      if (t.includes('PM') && !t.startsWith('12')) {
+          let [hour, minute] = t.split(':').map(Number);
+          return `${hour + 12}:${minute}`;
+      } else if (t.includes('AM') && t.startsWith('12')) {
+          return `00:${t.split(':')[1].slice(0, -2)}`;
+      } else {
+          return t.replace('AM', '').replace('PM', '').trim();
+      }
+  }
+
+  let [start, end] = timeStr.split(" - ");
+  return `${to24HourFormat(start)} - ${to24HourFormat(end)}`;
+}
+
 function generateICS(data) {
   const ics = __webpack_require__(/*! ics */ "./node_modules/ics/dist/index.js");
 
@@ -3978,6 +3994,9 @@ function generateICS(data) {
       description: `Class Nbr: ${item.classNbr}\nInstructor(s): ${item.instructor}`,
     };
   });
+
+  console.log(processedData);
+
   const adsf = [
     {
       title: 'Lunch',
