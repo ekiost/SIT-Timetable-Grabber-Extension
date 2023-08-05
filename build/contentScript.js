@@ -3920,6 +3920,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         const startTime = daysNTimes[0];
         const endTime = daysNTimes[1];
 
+        console.log(
+          `${courseName} ${lastClassNbr} ${lastSection} ${lastComponent} ${startTime} ${endTime} ${room} ${instructor} ${date}`
+        );
+
         data.push({
           courseName: courseName,
           classNbr: lastClassNbr,
