@@ -79,6 +79,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       let lastClassNbr = "";
       let lastSection = "";
       let lastComponent = "";
+      const campusAddress = {
+        "NYP" : "\n172A Ang Mo Kio Avenue 8\nSingapore 567739",
+        "DV" : "\n10 Dover Drive\nSingapore 138683",
+        "NP" : "\n537 Clementi Road\nSingapore 599493",
+        "RP" : "\n43 Woodlands Avenue 9\nSingapore 737729",
+        "SP" : "\n510 Dover Road\nSingapore 139660",
+        "TP" : "\nBlk 29B Tampines Avenue 1\nSingapore 528694"
+      }
       for (let i = 1; i < rows.length; i++) {
         const row = rows[i];
         const cells = row.querySelectorAll("td");
@@ -99,6 +107,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         if (component !== "" && component !== lastComponent) {
           lastComponent = component;
         }
+        let location = room
+        if (room.split("-")[0] in campusAddress) {
+          location = room + campusAddress[room.split("-")[0]];
+        }
 
         const startTime = normalizeTime(daysNTimes[0]);
         const endTime = normalizeTime(daysNTimes[1]);
@@ -110,7 +122,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           component: lastComponent,
           startTime: startTime,
           endTime: endTime,
-          room: room,
+          location: location,
           instructor: instructor,
           date: date,
         });
@@ -144,7 +156,7 @@ function normalizeTime(time) {
 
 function generateICS(data) {
   const ics = require("ics");
-
+  
   const processedData = data.map((item) => {
     return {
       title: `${item.courseName} (${item.section} ${item.component})`,
@@ -162,10 +174,7 @@ function generateICS(data) {
         Number(item.endTime.split(":")[0]),
         Number(item.endTime.split(":")[1]),
       ],
-      location: `${item.room}${item.room === "Online"
-        ? ""
-        : "\n172A Ang Mo Kio Ave 8\n567739\nSingapore"
-        }`,
+      location: item.location,
       description: `Class Nbr: ${item.classNbr}\nInstructor(s): ${item.instructor}`,
     };
   });
