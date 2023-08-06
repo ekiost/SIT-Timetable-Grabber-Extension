@@ -2,6 +2,8 @@
 
 SIT timetable extension for chrome
 
+Chrome Web Store: [https://chrome.google.com/webstore/detail/sit-timetable-grabber/cnffedmfildfgejcckjcmhabbdkpcibh](https://chrome.google.com/webstore/detail/sit-timetable-grabber/cnffedmfildfgejcckjcmhabbdkpcibh)
+
 ## Features
 
 - Extracts timetable from SIT website and downloads it as a ICS file
