@@ -86,7 +86,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         const classNbr = cells[0].innerText.trim();
         const section = cells[1].innerText.trim();
         const component = cells[2].innerText.trim();
-        const daysNTimes = normalizeTime(cells[3].innerText.trim().slice(3)).split(" - ");
+        const daysNTimes = cells[3].innerText.trim().slice(3).split(" - ");
         const room = cells[4].innerText.trim();
         const instructor = cells[5].innerText.trim();
         const date = cells[6].innerText.trim().split(" - ")[0];
@@ -101,9 +101,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           lastComponent = component;
         }
 
-        const startTime = daysNTimes[0];
-        const endTime = daysNTimes[1];
+        const startTime = normalizeTime(daysNTimes[0]);
+        const endTime = normalizeTime(daysNTimes[1]);
 
+        console.log(startTime, endTime);
 
         data.push({
           courseName: courseName,
@@ -121,7 +122,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
     const ics = generateICS(data);
 
-    console.log(ics);
+    // console.log(ics);
 
     downloadICS(ics);
   }
@@ -132,20 +133,18 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   return true;
 });
 
-function normalizeTime(timeStr) {
-  function to24HourFormat(t) {
-      if (t.includes('PM') && !t.startsWith('12')) {
-          let [hour, minute] = t.split(':').map(Number);
-          return `${hour + 12}:${minute}`;
-      } else if (t.includes('AM') && t.startsWith('12')) {
-          return `00:${t.split(':')[1].slice(0, -2)}`;
-      } else {
-          return t.replace('AM', '').replace('PM', '').trim();
-      }
-  }
+function normalizeTime(time) {
+  const dateAndTime = require('date-and-time');
 
-  let [start, end] = timeStr.split(" - ");
-  return `${to24HourFormat(start)} - ${to24HourFormat(end)}`;
+  if (time.length !== 5) {
+    if (time[0] !== "1") {
+      time = "0" + time;
+    }
+    time = time.slice(0, -2) + " " + time.slice(-2);
+    time = dateAndTime.transform(time, 'hh:mm A', 'HH:mm');
+  }
+  
+  return time;
 }
 
 function generateICS(data) {

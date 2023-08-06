@@ -22,6 +22,7 @@
     "webpack-merge": "^5.8.0"
   },
   "dependencies": {
+    "date-and-time": "^3.0.2",
     "file-saver": "^2.0.5",
     "ics": "^3.1.0"
   }
