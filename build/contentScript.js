@@ -4415,12 +4415,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       let lastSection = "";
       let lastComponent = "";
       const campusAddress = {
-        "NYP" : "\n172A Ang Mo Kio Avenue 8\nSingapore 567739",
-        "DV" : "\n10 Dover Drive\nSingapore 138683",
-        "NP" : "\n537 Clementi Road\nSingapore 599493",
-        "RP" : "\n43 Woodlands Avenue 9\nSingapore 737729",
-        "SP" : "\n510 Dover Road\nSingapore 139660",
-        "TP" : "\nBlk 29B Tampines Avenue 1\nSingapore 528694"
+        "NYP" : "\n172A Ang Mo Kio Avenue 8, Singapore 567739",
+        "DV" : "\n10 Dover Drive, Singapore 138683",
+        "NP" : "\n537 Clementi Road, Singapore 599493",
+        "RP" : "\n43 Woodlands Avenue 9, Singapore 737729",
+        "SP" : "\n510 Dover Road, Singapore 139660",
+        "TP" : "\nBlk 29B Tampines Avenue 1, Singapore 528694"
       }
       for (let i = 1; i < rows.length; i++) {
         const row = rows[i];
