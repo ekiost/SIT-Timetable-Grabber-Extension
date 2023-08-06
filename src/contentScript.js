@@ -64,7 +64,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
 
     const data = [];
-    // console.log(`Current count is ${request.payload.count}`);
 
     for (let i = 1; i < main.length; i++) {
       const element = main[i];
@@ -104,8 +103,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         const startTime = normalizeTime(daysNTimes[0]);
         const endTime = normalizeTime(daysNTimes[1]);
 
-        console.log(startTime, endTime);
-
         data.push({
           courseName: courseName,
           classNbr: lastClassNbr,
@@ -122,8 +119,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
     const ics = generateICS(data);
 
-    // console.log(ics);
-
     downloadICS(ics);
   }
 
@@ -137,13 +132,13 @@ function normalizeTime(time) {
   const dateAndTime = require('date-and-time');
 
   if (time.length !== 5) {
-    if (time[0] !== "1") {
+    if (time.length === 6) {
       time = "0" + time;
     }
     time = time.slice(0, -2) + " " + time.slice(-2);
     time = dateAndTime.transform(time, 'hh:mm A', 'HH:mm');
   }
-  
+
   return time;
 }
 
@@ -174,7 +169,7 @@ function generateICS(data) {
       description: `Class Nbr: ${item.classNbr}\nInstructor(s): ${item.instructor}`,
     };
   });
-
+  console.log(processedData);
   const { error, value } = ics.createEvents(processedData);
 
   if (error) {
