@@ -112,19 +112,18 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           location = room + campusAddress[room.split("-")[0]];
         }
 
-        const startTime = normalizeTime(daysNTimes[0]);
-        const endTime = normalizeTime(daysNTimes[1]);
+        const start = normalizeTime(daysNTimes[0], date);
+        const end = normalizeTime(daysNTimes[1], date);
 
         data.push({
           courseName: courseName,
           classNbr: lastClassNbr,
           section: lastSection,
           component: lastComponent,
-          startTime: startTime,
-          endTime: endTime,
+          startTime: start,
+          endTime: end,
           location: location,
           instructor: instructor,
-          date: date,
         });
       }
     }
@@ -140,7 +139,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   return true;
 });
 
-function normalizeTime(time) {
+function normalizeTime(time, date) {
   const dateAndTime = require('date-and-time');
 
   if (time.length !== 5) {
@@ -150,30 +149,33 @@ function normalizeTime(time) {
     time = time.slice(0, -2) + " " + time.slice(-2);
     time = dateAndTime.transform(time, 'hh:mm A', 'HH:mm');
   }
-
-  return time;
+  
+  return dateAndTime.parse(date + " " + time + " +0800", 'DD/MM/YYYY HH:mm Z');
 }
 
 function generateICS(data) {
   const ics = require("ics");
+  const dateAndTime = require('date-and-time');
   
   const processedData = data.map((item) => {
     return {
       title: `${item.courseName} (${item.section} ${item.component})`,
       start: [
-        Number(item.date.split("/")[2]),
-        Number(item.date.split("/")[1]),
-        Number(item.date.split("/")[0]),
-        Number(item.startTime.split(":")[0]),
-        Number(item.startTime.split(":")[1]),
+        Number(dateAndTime.format(item.startTime, "YYYY", true)),
+        Number(dateAndTime.format(item.startTime, "MM", true)),
+        Number(dateAndTime.format(item.startTime, "DD", true)),
+        Number(dateAndTime.format(item.startTime, "H", true)),
+        Number(dateAndTime.format(item.startTime, "m", true)),
       ],
+      startInputType: "utc",
       end: [
-        Number(item.date.split("/")[2]),
-        Number(item.date.split("/")[1]),
-        Number(item.date.split("/")[0]),
-        Number(item.endTime.split(":")[0]),
-        Number(item.endTime.split(":")[1]),
+        Number(dateAndTime.format(item.endTime, "YYYY", true)),
+        Number(dateAndTime.format(item.endTime, "MM", true)),
+        Number(dateAndTime.format(item.endTime, "DD", true)),
+        Number(dateAndTime.format(item.endTime, "H", true)),
+        Number(dateAndTime.format(item.endTime, "m", true)),
       ],
+      endInputType: "utc",
       location: item.location,
       description: `Class Nbr: ${item.classNbr}\nInstructor(s): ${item.instructor}`,
     };
