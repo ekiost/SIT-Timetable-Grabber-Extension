@@ -80,20 +80,24 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       let lastSection = "";
       let lastComponent = "";
       const campusAddress = {
-        "NYP" : "\n172A Ang Mo Kio Avenue 8, Singapore 567739",
-        "DV" : "\n10 Dover Drive, Singapore 138683",
-        "NP" : "\n537 Clementi Road, Singapore 599493",
-        "RP" : "\n43 Woodlands Avenue 9, Singapore 737729",
-        "SP" : "\n510 Dover Road, Singapore 139660",
-        "TP" : "\nBlk 29B Tampines Avenue 1, Singapore 528694"
-      }
+        NYP: "\n172A Ang Mo Kio Avenue 8, Singapore 567739",
+        DV: "\n10 Dover Drive, Singapore 138683",
+        NP: "\n537 Clementi Road, Singapore 599493",
+        RP: "\n43 Woodlands Avenue 9, Singapore 737729",
+        SP: "\n510 Dover Road, Singapore 139660",
+        TP: "\nBlk 29B Tampines Avenue 1, Singapore 528694",
+      };
       for (let i = 1; i < rows.length; i++) {
         const row = rows[i];
         const cells = row.querySelectorAll("td");
         const classNbr = cells[0].innerText.trim();
         const section = cells[1].innerText.trim();
         const component = cells[2].innerText.trim();
-        const daysNTimes = cells[3].innerText.trim().slice(3).split(" - ");
+        let daysNTimes = cells[3].innerText.trim();
+        if (!daysNTimes.includes("-")) {
+          continue;
+        }
+        daysNTimes = daysNTimes.slice(3).split(" - ");
         const room = cells[4].innerText.trim();
         const instructor = cells[5].innerText.trim();
         const date = cells[6].innerText.trim().split(" - ")[0];
@@ -107,7 +111,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         if (component !== "" && component !== lastComponent) {
           lastComponent = component;
         }
-        let location = room
+        let location = room;
         if (room.split("-")[0] in campusAddress) {
           location = room + campusAddress[room.split("-")[0]];
         }
@@ -140,23 +144,23 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 });
 
 function normalizeTime(time, date) {
-  const dateAndTime = require('date-and-time');
+  const dateAndTime = require("date-and-time");
 
   if (time.length !== 5) {
     if (time.length === 6) {
       time = "0" + time;
     }
     time = time.slice(0, -2) + " " + time.slice(-2);
-    time = dateAndTime.transform(time, 'hh:mm A', 'HH:mm');
+    time = dateAndTime.transform(time, "hh:mm A", "HH:mm");
   }
-  
-  return dateAndTime.parse(date + " " + time + " +0800", 'DD/MM/YYYY HH:mm Z');
+
+  return dateAndTime.parse(date + " " + time + " +0800", "DD/MM/YYYY HH:mm Z");
 }
 
 function generateICS(data) {
   const ics = require("ics");
-  const dateAndTime = require('date-and-time');
-  
+  const dateAndTime = require("date-and-time");
+
   const processedData = data.map((item) => {
     return {
       title: `${item.courseName} (${item.section} ${item.component})`,
@@ -180,7 +184,6 @@ function generateICS(data) {
       description: `Class Nbr: ${item.classNbr}\nInstructor(s): ${item.instructor}`,
     };
   });
-  console.log(processedData);
   const { error, value } = ics.createEvents(processedData);
 
   if (error) {
@@ -192,7 +195,7 @@ function generateICS(data) {
 }
 
 function downloadICS(ics) {
-  var FileSaver = require('file-saver');
+  var FileSaver = require("file-saver");
   var blob = new Blob([ics], { type: "text/plain;charset=utf-8" });
   FileSaver.saveAs(blob, "myFile.ics");
 }
