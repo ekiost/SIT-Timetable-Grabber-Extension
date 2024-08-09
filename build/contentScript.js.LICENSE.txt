@@ -1,3 +1,0 @@
-/**
-     * @preserve date-and-time (c) KNOWLEDGECODE | MIT
-     */

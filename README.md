@@ -1,23 +1,37 @@
-# <img src="public/icons/icon_48.png" width="45" align="left"> Sit Timetable
+# test
 
-SIT timetable extension for chrome
+> This project was bootstrapped using the Extension.js React-TypeScript template.
 
-Chrome Web Store: [https://chrome.google.com/webstore/detail/sit-timetable-grabber/cnffedmfildfgejcckjcmhabbdkpcibh](https://chrome.google.com/webstore/detail/sit-timetable-grabber/cnffedmfildfgejcckjcmhabbdkpcibh)
+## Scripts Available
 
-## Features
+In the project directory, you can run:
 
-- Extracts timetable from SIT website and downloads it as a ICS file
-- Can be used to import timetable to your calendar app (Google Calendar, Outlook, etc.)
+### npm dev
 
-<!-- ## Install
+```
+// Runs the app in the development mode.
+// Will open a new browser instance with your extension loaded.
+// The page will reload when you make changes.
+npm dev
+```
 
-[**Chrome** extension]() TODO: Add chrome extension link inside parenthesis -->
+### npm start
 
-## Contribution
+```
+// Runs the app in the production mode.
+// Will open a new browser instance with your extension loaded.
+// This is how your browser extension will work once published.
+npm start
+```
 
-Suggestions and pull requests are welcomed!.
+### npm build
 
----
+```
+// Builds the app for production.
+// Bundles your browser extension in production mode for the target browser.
+npm run build
+```
 
-This project was bootstrapped with [Chrome Extension CLI](https://github.com/dutiyesh/chrome-extension-cli)
+## Learn More
 
+You can learn more in the [Extension.js](https://extension.js.org) documentation.

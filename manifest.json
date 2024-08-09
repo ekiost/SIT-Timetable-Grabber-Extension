@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "SIT Timetable Grabber",
+  "version": "0.1.4",
+  "description": "Extract timetable from IN4SIT website",
+  "background": {
+    "service_worker": "./background.ts"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://in4sit.singaporetech.edu.sg/*"
+      ],
+      "js": [
+        "./content/content.tsx"
+      ]
+    }
+  ],
+  "icons": {
+    "16": "public/icon/icon_16.png",
+    "48": "public/icon/icon_48.png"
+  }
+}
