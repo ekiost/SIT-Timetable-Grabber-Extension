@@ -43,10 +43,8 @@ function generateModuleICS(classInfoArray: ClassInfo[]) {
     title: `${item.courseName} (${item.section} ${item.component})`,
     start: [item.startTime.getFullYear(), item.startTime.getMonth() + 1, item.startTime.getDate(),
     item.startTime.getHours(), item.startTime.getMinutes()],
-    startInputType: "utc",
     end: [item.endTime.getFullYear(), item.endTime.getMonth() + 1, item.endTime.getDate(),
     item.endTime.getHours(), item.endTime.getMinutes()],
-    endInputType: "utc",
     location: item.location,
     description: `Class Nbr: ${item.classNbr}\nInstructor(s): ${item.instructor}`,
   }));
@@ -87,6 +85,9 @@ function parseModuleTimetable(moduleElements: HTMLCollectionOf<Element>) {
       if (campusCode in campusAddress) {
         location += campusAddress[campusCode];
       }
+      else if (campusCode[0] in campusAddress) {
+        location += campusAddress[campusCode[0]];
+      }
 
       const start = normalizeTime(daysNTimes[0], date.split(" - ")[0]);
       const end = normalizeTime(daysNTimes[1], date.split(" - ")[0]);
@@ -124,6 +125,9 @@ function parseExamTimetable(examElements: HTMLCollectionOf<Element>) {
     if (campusCode in campusAddress) {
       venue += campusAddress[campusCode];
     }
+    else if (campusCode[0] in campusAddress) {
+      venue += campusAddress[campusCode[0]];
+    }
 
     const seatingInformation = {
       courseName: parsedElement[2].split(" ").slice(0, 2).join(" ") + " - " + parsedElement[2].split(" ").slice(2).join(" ") + " (Exam)",
@@ -136,6 +140,11 @@ function parseExamTimetable(examElements: HTMLCollectionOf<Element>) {
     data.push(seatingInformation);
   }
   console.log(data);
+
+  if (data.length === 0) {
+    alert("No exam timetable found");
+    return;
+  }
 
   const icsData = generateExamICS(data);
   if (icsData) {
@@ -150,10 +159,8 @@ function generateExamICS(examInfoArray: any[]) {
     title: item.courseName,
     start: [item.startTime.getFullYear(), item.startTime.getMonth() + 1, item.startTime.getDate(),
     item.startTime.getHours(), item.startTime.getMinutes()],
-    startInputType: "utc",
     end: [item.endTime.getFullYear(), item.endTime.getMonth() + 1, item.endTime.getDate(),
     item.endTime.getHours(), item.endTime.getMinutes()],
-    endInputType: "utc",
     location: item.location,
     description: `Seat Number: ${item.seatNumber}`,
   }));
