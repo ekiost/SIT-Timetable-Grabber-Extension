@@ -2,7 +2,7 @@
   "devDependencies": {
     "@types/react": "^18.0.9",
     "@types/react-dom": "^18.0.5",
-    "extension": "latest",
+    "extension": "^4.1.10",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
     "tailwindcss": "^3.4.1",
@@ -25,5 +25,8 @@
     "date-and-time": "^3.4.1",
     "file-saver": "^2.0.5",
     "ics": "^3.7.6"
+  },
+  "overrides": {
+    "shell-quote": "^1.8.4"
   }
 }
