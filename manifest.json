@@ -1,10 +1,11 @@
 {
   "manifest_version": 3,
   "name": "SIT Timetable Grabber",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Extract timetable from IN4SIT website",
   "background": {
-    "service_worker": "./background.ts"
+    "service_worker": "./background.ts",
+    "scripts": ["./background.ts"]
   },
   "content_scripts": [
     {
