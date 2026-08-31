@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "SIT Timetable Grabber",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "Extract timetable from IN4SIT website",
   "background": {
     "service_worker": "./background.ts",
@@ -17,5 +17,10 @@
   "icons": {
     "16": "public/icon/icon_16.png",
     "48": "public/icon/icon_48.png"
+  },
+  "browser_settings": {
+    "gecko": {
+      "id": "sit-timetable-grabber@nmd.com"
+    }
   }
 }
