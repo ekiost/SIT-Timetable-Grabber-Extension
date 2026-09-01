@@ -18,7 +18,7 @@
     "16": "public/icon/icon_16.png",
     "48": "public/icon/icon_48.png"
   },
-  "browser_settings": {
+  "browser_specific_settings": {
     "gecko": {
       "id": "sit-timetable-grabber@nmd.com"
     }
